@@ -1,113 +1,208 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, MeshDistortMaterial } from '@react-three/drei';
+import { Float, Edges } from '@react-three/drei';
 import * as THREE from 'three';
 
-// A simple house shape using basic geometry
-function HouseModel() {
+// Wireframe room structure — architectural, premium
+function WireframeRoom() {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.12;
-      groupRef.current.position.y = Math.sin(t * 0.5) * 0.15;
+      groupRef.current.rotation.y = t * 0.08;
+      groupRef.current.rotation.x = Math.sin(t * 0.15) * 0.05;
     }
   });
 
+  const edgeColor = '#1a7a8a';
+  const accentColor = '#b87a4a';
+
   return (
-    <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.4}>
-      <group ref={groupRef} scale={1.2}>
-        {/* House body */}
-        <mesh position={[0, -0.2, 0]}>
-          <boxGeometry args={[2, 1.6, 1.8]} />
-          <meshStandardMaterial color="#e8e0d6" metalness={0.1} roughness={0.7} />
+    <Float speed={0.8} rotationIntensity={0.05} floatIntensity={0.3}>
+      <group ref={groupRef} scale={1.1} position={[0, -0.3, 0]}>
+        {/* Floor */}
+        <mesh position={[0, -1.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[4, 3.5]} />
+          <meshBasicMaterial transparent opacity={0.02} />
+          <Edges color={edgeColor} threshold={15} lineWidth={1} />
         </mesh>
-        {/* Roof - pyramid */}
-        <mesh position={[0, 0.95, 0]} rotation={[0, Math.PI / 4, 0]}>
-          <coneGeometry args={[1.7, 1, 4]} />
-          <meshStandardMaterial color="#1a7a8a" metalness={0.3} roughness={0.5} />
+
+        {/* Back wall */}
+        <mesh position={[0, 0.05, -1.75]}>
+          <planeGeometry args={[4, 2.5]} />
+          <meshBasicMaterial transparent opacity={0.02} />
+          <Edges color={edgeColor} threshold={15} lineWidth={1} />
         </mesh>
-        {/* Door */}
-        <mesh position={[0, -0.55, 0.91]}>
-          <boxGeometry args={[0.45, 0.7, 0.05]} />
-          <meshStandardMaterial color="#b87a4a" metalness={0.4} roughness={0.4} />
+
+        {/* Left wall */}
+        <mesh position={[-2, 0.05, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <planeGeometry args={[3.5, 2.5]} />
+          <meshBasicMaterial transparent opacity={0.02} />
+          <Edges color={edgeColor} threshold={15} lineWidth={1} />
         </mesh>
-        {/* Window left */}
-        <mesh position={[-0.55, 0, 0.91]}>
-          <boxGeometry args={[0.35, 0.35, 0.05]} />
-          <meshStandardMaterial color="#a8d8e0" metalness={0.2} roughness={0.3} transparent opacity={0.7} />
-        </mesh>
-        {/* Window right */}
-        <mesh position={[0.55, 0, 0.91]}>
-          <boxGeometry args={[0.35, 0.35, 0.05]} />
-          <meshStandardMaterial color="#a8d8e0" metalness={0.2} roughness={0.3} transparent opacity={0.7} />
+
+        {/* Sofa wireframe */}
+        <group position={[-0.8, -0.75, -1]}>
+          <mesh>
+            <boxGeometry args={[1.6, 0.5, 0.7]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+          {/* Sofa back */}
+          <mesh position={[0, 0.35, -0.25]}>
+            <boxGeometry args={[1.6, 0.4, 0.2]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+          {/* Left arm */}
+          <mesh position={[-0.7, 0.15, 0]}>
+            <boxGeometry args={[0.15, 0.25, 0.7]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+          {/* Right arm */}
+          <mesh position={[0.7, 0.15, 0]}>
+            <boxGeometry args={[0.15, 0.25, 0.7]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+        </group>
+
+        {/* Coffee table */}
+        <group position={[-0.8, -1, 0]}>
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[0.8, 0.05, 0.5]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={edgeColor} threshold={15} lineWidth={1} />
+          </mesh>
+          {/* Legs */}
+          {[[-0.35, -0.1, -0.2], [0.35, -0.1, -0.2], [-0.35, -0.1, 0.2], [0.35, -0.1, 0.2]].map((pos, i) => (
+            <mesh key={i} position={pos as [number, number, number]}>
+              <cylinderGeometry args={[0.015, 0.015, 0.18, 6]} />
+              <meshBasicMaterial transparent opacity={0} />
+              <Edges color={edgeColor} threshold={15} lineWidth={1} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Floor lamp */}
+        <group position={[1.3, -0.5, -1.2]}>
+          <mesh position={[0, -0.7, 0]}>
+            <cylinderGeometry args={[0.12, 0.12, 0.02, 12]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+          <mesh position={[0, -0.05, 0]}>
+            <cylinderGeometry args={[0.015, 0.015, 1.3, 6]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+          <mesh position={[0, 0.45, 0]}>
+            <coneGeometry args={[0.2, 0.3, 8, 1, true]} />
+            <meshBasicMaterial transparent opacity={0} />
+            <Edges color={accentColor} threshold={15} lineWidth={1} />
+          </mesh>
+        </group>
+
+        {/* Shelf unit on left wall */}
+        <group position={[-1.9, 0, -0.5]} rotation={[0, Math.PI / 2, 0]}>
+          {[0, 0.45, 0.9].map((y, i) => (
+            <mesh key={i} position={[0, y - 0.4, 0]}>
+              <boxGeometry args={[0.8, 0.04, 0.25]} />
+              <meshBasicMaterial transparent opacity={0} />
+              <Edges color={edgeColor} threshold={15} lineWidth={1} />
+            </mesh>
+          ))}
+          {/* Shelf sides */}
+          {[-0.38, 0.38].map((x, i) => (
+            <mesh key={i} position={[x, 0.05, 0]}>
+              <boxGeometry args={[0.04, 1, 0.25]} />
+              <meshBasicMaterial transparent opacity={0} />
+              <Edges color={edgeColor} threshold={15} lineWidth={1} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Window on back wall */}
+        <group position={[1, 0.2, -1.74]}>
+          <mesh>
+            <boxGeometry args={[0.9, 0.7, 0.02]} />
+            <meshBasicMaterial transparent opacity={0.03} color="#a8d8e0" />
+            <Edges color={edgeColor} threshold={15} lineWidth={1} />
+          </mesh>
+          {/* Window cross */}
+          <mesh position={[0, 0, 0.01]}>
+            <boxGeometry args={[0.9, 0.015, 0.01]} />
+            <meshBasicMaterial color={edgeColor} transparent opacity={0.4} />
+          </mesh>
+          <mesh position={[0, 0, 0.01]}>
+            <boxGeometry args={[0.015, 0.7, 0.01]} />
+            <meshBasicMaterial color={edgeColor} transparent opacity={0.4} />
+          </mesh>
+        </group>
+
+        {/* Rug (circle on floor) */}
+        <mesh position={[-0.8, -1.19, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.35, 0.6, 24]} />
+          <meshBasicMaterial transparent opacity={0} />
+          <Edges color={accentColor} threshold={15} lineWidth={0.8} />
         </mesh>
       </group>
     </Float>
   );
 }
 
-// Floating furniture pieces
-function FurniturePieces() {
-  const sofaRef = useRef<THREE.Mesh>(null);
-  const tableRef = useRef<THREE.Mesh>(null);
-  const lampRef = useRef<THREE.Group>(null);
+// Floating data points / grid lines
+function DataGrid() {
+  const ref = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    if (sofaRef.current) {
-      sofaRef.current.position.x = -3 + Math.sin(t * 0.3) * 0.3;
-      sofaRef.current.position.y = -1 + Math.sin(t * 0.5) * 0.2;
-      sofaRef.current.rotation.y = t * 0.1;
-    }
-    if (tableRef.current) {
-      tableRef.current.position.x = 3 + Math.cos(t * 0.4) * 0.2;
-      tableRef.current.position.y = 0.5 + Math.sin(t * 0.6) * 0.15;
-      tableRef.current.rotation.y = -t * 0.08;
-    }
-    if (lampRef.current) {
-      lampRef.current.position.y = -0.5 + Math.sin(t * 0.4 + 1) * 0.2;
+    if (ref.current) {
+      ref.current.rotation.y = t * 0.02;
     }
   });
 
+  const lines = useMemo(() => {
+    const arr: { start: [number, number, number]; end: [number, number, number] }[] = [];
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const r = 4.5;
+      arr.push({
+        start: [Math.cos(angle) * r, -2, Math.sin(angle) * r],
+        end: [Math.cos(angle) * r, 2, Math.sin(angle) * r],
+      });
+    }
+    return arr;
+  }, []);
+
+  const geometries = useMemo(() => {
+    return lines.map((line) => {
+      const points = [new THREE.Vector3(...line.start), new THREE.Vector3(...line.end)];
+      return new THREE.BufferGeometry().setFromPoints(points);
+    });
+  }, [lines]);
+
   return (
-    <>
-      {/* Floating sofa shape */}
-      <mesh ref={sofaRef} position={[-3, -1, -1]}>
-        <boxGeometry args={[0.8, 0.3, 0.4]} />
-        <meshStandardMaterial color="#1a7a8a" metalness={0.2} roughness={0.6} transparent opacity={0.5} />
-      </mesh>
-
-      {/* Floating table */}
-      <mesh ref={tableRef} position={[3, 0.5, -0.5]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.08, 16]} />
-        <meshStandardMaterial color="#b87a4a" metalness={0.5} roughness={0.3} transparent opacity={0.5} />
-      </mesh>
-
-      {/* Floating lamp */}
-      <group ref={lampRef} position={[2.5, -0.5, 1]}>
-        <mesh>
-          <cylinderGeometry args={[0.02, 0.02, 0.6, 8]} />
-          <meshStandardMaterial color="#b87a4a" metalness={0.6} roughness={0.3} transparent opacity={0.4} />
-        </mesh>
-        <mesh position={[0, 0.35, 0]}>
-          <coneGeometry args={[0.15, 0.15, 8]} />
-          <meshStandardMaterial color="#daa520" metalness={0.4} roughness={0.3} transparent opacity={0.4} />
-        </mesh>
-      </group>
-    </>
+    <group ref={ref}>
+      {geometries.map((geo, i) => (
+        <primitive key={i} object={new THREE.Line(geo, new THREE.LineBasicMaterial({ color: '#1a7a8a', transparent: true, opacity: 0.06 }))} />
+      ))}
+    </group>
   );
 }
 
 function Particles() {
-  const count = 50;
+  const count = 80;
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 14;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 6;
+      const angle = Math.random() * Math.PI * 2;
+      const r = 2 + Math.random() * 4;
+      pos[i * 3] = Math.cos(angle) * r;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 5;
+      pos[i * 3 + 2] = Math.sin(angle) * r;
     }
     return pos;
   }, []);
@@ -115,7 +210,7 @@ function Particles() {
   const ref = useRef<THREE.Points>(null);
   useFrame((state) => {
     if (ref.current) {
-      ref.current.rotation.y = state.clock.getElapsedTime() * 0.01;
+      ref.current.rotation.y = state.clock.getElapsedTime() * 0.015;
     }
   });
 
@@ -124,7 +219,7 @@ function Particles() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} count={count} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.02} color="#1a7a8a" transparent opacity={0.3} sizeAttenuation />
+      <pointsMaterial size={0.015} color="#1a7a8a" transparent opacity={0.25} sizeAttenuation />
     </points>
   );
 }
@@ -132,13 +227,12 @@ function Particles() {
 export default function Scene3D() {
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 2]}>
-        <ambientLight intensity={0.9} />
-        <pointLight position={[5, 5, 5]} intensity={0.4} color="#1a7a8a" />
-        <pointLight position={[-5, -3, 3]} intensity={0.3} color="#b87a4a" />
-        <directionalLight position={[0, 10, 5]} intensity={0.5} color="#ffffff" />
-        <HouseModel />
-        <FurniturePieces />
+      <Canvas camera={{ position: [3, 1.5, 5], fov: 40 }} dpr={[1, 2]}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[5, 5, 5]} intensity={0.2} color="#1a7a8a" />
+        <pointLight position={[-5, -3, 3]} intensity={0.15} color="#b87a4a" />
+        <WireframeRoom />
+        <DataGrid />
         <Particles />
       </Canvas>
     </div>
